@@ -88,8 +88,6 @@ python manage.py runserver
 - Start the development server
 
 ## Roadmap
-- Add GitHub CI workflow
-- Add tests and coverage
 - Add JWT auth
 - Add API docs
 - Add black/ruff to CI workflow
