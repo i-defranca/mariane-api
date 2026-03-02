@@ -1,8 +1,7 @@
 # Mariane API
 
-[![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
-
 [![Coverage](https://codecov.io/gh/i-defranca/mariane-api/graph/badge.svg?token=LNC0J557JV)](https://codecov.io/gh/i-defranca/mariane-api)
+[![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](LICENSE)
 
 A Django REST API for tracking menstrual cycles and daily metrics, aiming to provide personalized insights and predictions.
 
