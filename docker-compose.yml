@@ -1,0 +1,25 @@
+services:
+  database:
+    image: mysql:8.4
+    ports:
+      - "${KOOL_DATABASE_PORT:-3306}:3306"
+    environment:
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD-rootpwd}"
+      MYSQL_DATABASE: "${DB_DATABASE-database}"
+      MYSQL_USER: "${DB_USERNAME-user}"
+      MYSQL_PASSWORD: "${DB_PASSWORD-pass}"
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - database:/var/lib/mysql:delegated
+    networks:
+      - kool_local
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+volumes:
+  database: null
+networks:
+  kool_local: null
+  kool_global:
+    external: true
+    name: ${KOOL_GLOBAL_NETWORK:-kool_global}
