@@ -8,11 +8,13 @@ A Django REST API for tracking menstrual cycles and daily metrics, aiming to pro
 
 ## Tech Stack
 - Python 3.12.2 (with pyenv)
+- Django
 - MySQL (Dockerized)
 - Docker / Docker Compose v2
 - kool.dev (optional)
 
 ## Architecture
+- Django app managed with pyenv and venv
 - MySQL running inside a Docker container
 - Environment variables loaded from `.env` file
 
@@ -37,6 +39,7 @@ pyenv local 3.12.2
 
 python -m venv .venv
 . .venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ### 3) Environment Configuration
@@ -69,8 +72,20 @@ kool status
 ```
 > The database will be available according to the variables set in your .env file.
 
+### 5) Run the Application
+```bash
+python manage.py migrate
+python manage.py runserver
+```
+> The development server will start on http://localhost:8000/
+
+## Development Workflow
+- Start the database container
+- Activate the virtual environment
+- Run migrations
+- Start the development server
+
 ## Roadmap
-- Add Django
 - Add GitHub CI workflow
 - Add tests and coverage
 - Add JWT auth
