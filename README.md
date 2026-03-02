@@ -1,5 +1,6 @@
 # Mariane API
 
+[![CI](https://github.com/i-defranca/mariane-api/actions/workflows/ci.yml/badge.svg)](https://github.com/i-defranca/mariane-api/actions/workflows/ci.yml)
 [![Coverage](https://codecov.io/gh/i-defranca/mariane-api/graph/badge.svg?token=LNC0J557JV)](https://codecov.io/gh/i-defranca/mariane-api)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](LICENSE)
 
