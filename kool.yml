@@ -1,4 +1,5 @@
 scripts:
   mysql: kool exec -e MYSQL_PWD=$DB_PASSWORD database mysql -u $DB_USERNAME $DB_DATABASE
-  test: pytest --reuse-db
-  cov: pytest --cov=. --cov-report=term-missing
+  root: kool exec database mysql -u root -p$DB_PASSWORD
+  test: pytest --create-db
+  tcov: pytest --cov=. --cov-report=term-missing
