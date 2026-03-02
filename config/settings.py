@@ -1,9 +1,19 @@
+import os
 from pathlib import Path
 
-DIR = Path(__file__).resolve().parent.parent
+from dotenv import load_dotenv as load
 
-DEBUG = True
-SECRET_KEY = 'django-insecure-l_iute3z'
+load(Path(__file__).resolve().parent.parent / '.env')
+
+IS_PRODUCTION = os.getenv('DJANGO_ENV') == 'PRODUCTION'
+
+DEBUG = os.getenv('DEBUG') == 'True'
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+CSRF_COOKIE_SECURE = IS_PRODUCTION
+SECURE_SSL_REDIRECT = IS_PRODUCTION
+SESSION_COOKIE_SECURE = IS_PRODUCTION
+CORS_ALLOW_ALL_ORIGINS = not IS_PRODUCTION
 
 ALLOWED_HOSTS = []
 
@@ -26,18 +36,18 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
-        'NAME': 'DB_DATABASE',
-        'USER': 'DB_USERNAME',
-        'PASSWORD': 'DB_PASSWORD',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'NAME': os.getenv('DB_DATABASE'),
+        'USER': os.getenv('DB_USERNAME'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+        'PORT': os.getenv('DB_PORT', '3306'),
     }
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = os.getenv('LANGUAGE_CODE', 'en-us')
+TIME_ZONE = os.getenv('TIME_ZONE', 'UTC')
 
 USE_I18N = True
 USE_TZ = True
