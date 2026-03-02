@@ -12,6 +12,8 @@ A Django REST API for tracking menstrual cycles and daily metrics, aiming to pro
 - MySQL (Dockerized)
 - Docker / Docker Compose v2
 - kool.dev (optional)
+- GitHub Actions (CI)
+- pytest + pytest-django + pytest-cov
 
 ## Architecture
 - Django app managed with pyenv and venv
