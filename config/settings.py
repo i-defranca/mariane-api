@@ -3,7 +3,13 @@ from pathlib import Path
 
 from dotenv import load_dotenv as load
 
-load(Path(__file__).resolve().parent.parent / '.env')
+from config.logs import setup_structlog
+
+DIR = Path(__file__).resolve().parent.parent
+
+load(DIR / '.env')
+
+LOGGING = setup_structlog(DIR, os.getenv('LOG_LEVEL'))
 
 IS_PRODUCTION = os.getenv('DJANGO_ENV') == 'PRODUCTION'
 
@@ -22,17 +28,21 @@ INSTALLED_APPS = [
     'rest_framework',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django_structlog',
     'api',
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'django_structlog.middlewares.RequestMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+DJANGO_STRUCTLOG = {'REQUEST_ID_HEADER': 'HTTP_X_REQUEST_ID'}
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
