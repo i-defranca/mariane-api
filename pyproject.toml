@@ -1,0 +1,38 @@
+[tool.black]
+line-length = 88
+target-version = ['py311']
+skip-string-normalization = true
+exclude = '''
+/(
+    migrations
+  | .venv
+  | build
+  | dist
+)/
+'''
+
+[tool.ruff]
+line-length = 88
+target-version = 'py311'
+exclude = [
+    'migrations',
+    '.venv',
+    'build',
+    'dist',
+]
+
+[tool.ruff.lint]
+select = [
+    'E',   # pycodestyle errors
+    'F',   # pyflakes
+    'I',   # import sorting
+    'UP',  # pyupgrade
+    'B',   # bugbear
+]
+ignore = [
+    'E501',  # line too long
+]
+
+[tool.ruff.format]
+quote-style = 'single'
+indent-style = 'space'
