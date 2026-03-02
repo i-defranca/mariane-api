@@ -7,6 +7,10 @@ from structlog import contextvars, processors
 from structlog.stdlib import BoundLogger, LoggerFactory, ProcessorFormatter
 
 
+def Logger(name=None):
+    return struct.get_logger(name)
+
+
 class DailyFileHandler(logging.FileHandler):
     def __init__(self, log_dir, prefix=''):
         self.log_dir = pathlib.Path(log_dir)
@@ -71,9 +75,23 @@ def setup_structlog(DIR, LOG_LEVEL):
                 'log_dir': LOG_DIR,
                 'prefix': '',
             },
+            'query_file': {
+                'level': 'DEBUG',
+                'class': 'config.logs.DailyFileHandler',
+                'formatter': 'structlog',
+                'log_dir': LOG_DIR,
+                'prefix': 'query_',
+            },
         },
         'root': {
             'handlers': ['app_file'],
             'level': LOG_LEVEL,
+        },
+        'loggers': {
+            'query': {
+                'handlers': ['query_file'],
+                'level': 'DEBUG',
+                'propagate': False,
+            },
         },
     }
