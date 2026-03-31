@@ -39,6 +39,66 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='Metric',
+            fields=[
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
+                ('slug', models.SlugField(unique=True)),
+                ('custom', models.BooleanField(default=False)),
+                ('multiple', models.BooleanField(default=False)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='MetricOption',
+            fields=[
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
+                ('label', models.CharField(max_length=100)),
+                (
+                    'metric',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='options',
+                        to='api.metric',
+                    ),
+                ),
+                (
+                    'user',
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='custom_options',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+            options={
+                'indexes': [
+                    models.Index(
+                        fields=['metric'], name='api_metrico_metric__3c6895_idx'
+                    ),
+                    models.Index(
+                        fields=['user'], name='api_metrico_user_id_226599_idx'
+                    ),
+                ],
+            },
+        ),
+        migrations.CreateModel(
             name='Period',
             fields=[
                 (

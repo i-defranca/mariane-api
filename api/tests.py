@@ -4,7 +4,7 @@ import pytest
 from django.core.exceptions import ValidationError
 from pytest import mark
 
-from .models import Period, User
+from .models import Metric, MetricOption, Period, User
 
 
 def test_api_health(client):
@@ -14,6 +14,14 @@ def test_api_health(client):
 
 def create_user(username='username'):
     return User.objects.create_user(username=username)
+
+
+def create_metric(slug='mood', multiple=False):
+    return Metric.objects.create(slug=slug, multiple=multiple)
+
+
+def create_option(metric, label='Happy'):
+    return MetricOption.objects.create(label=label, metric=metric)
 
 
 @mark.django_db
@@ -43,3 +51,13 @@ def test_period_creation():
 
     assert Period.objects.count() == 1
     assert str(period) == f'{user} - {period.start_date}'
+
+
+@mark.django_db
+def test_metric_creation():
+    assert str(create_metric('slug')) == 'slug'
+
+
+@mark.django_db
+def test_metric_option_creation():
+    assert str(create_option(create_metric(), 'label')) == 'label'

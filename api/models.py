@@ -46,3 +46,33 @@ class Period(models.Model):
 
     def __str__(self):
         return f'{self.user} - {self.start_date}'
+
+
+class Metric(models.Model):
+    slug = models.SlugField(unique=True)
+    custom = models.BooleanField(default=False)
+    multiple = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.slug)
+
+
+class MetricOption(models.Model):
+    label = models.CharField(max_length=100)
+    metric = models.ForeignKey(Metric, on_delete=models.CASCADE, related_name='options')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='custom_options',
+    )
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['metric']),
+            models.Index(fields=['user']),
+        ]
+
+    def __str__(self):
+        return str(self.label)
