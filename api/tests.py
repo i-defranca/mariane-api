@@ -1,7 +1,10 @@
+from datetime import date
+
 import pytest
+from django.core.exceptions import ValidationError
 from pytest import mark
 
-from .models import User
+from .models import Period, User
 
 
 def test_api_health(client):
@@ -22,3 +25,21 @@ def test_username_validation():
 @mark.django_db
 def test_user_creation():
     assert str(create_user('username')) == 'username'
+
+
+@mark.django_db
+def test_period_dates_validation():
+    with pytest.raises(ValidationError):
+        Period(user=create_user()).full_clean()
+
+
+@mark.django_db
+def test_period_creation():
+    user = create_user()
+
+    period = Period(user=user, start_date=date(2026, 3, 1), end_date=date(2026, 3, 5))
+    period.full_clean()
+    period.save()
+
+    assert Period.objects.count() == 1
+    assert str(period) == f'{user} - {period.start_date}'

@@ -1,6 +1,8 @@
 from uuid import uuid4
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -24,3 +26,23 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.username
+
+
+class Period(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='periods'
+    )
+
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=['user', 'start_date'])]
+
+    def clean(self):
+        if not self.start_date and not self.end_date:
+            raise ValidationError('At least one date is required!')
+
+    def __str__(self):
+        return f'{self.user} - {self.start_date}'
