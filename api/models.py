@@ -76,3 +76,45 @@ class MetricOption(models.Model):
 
     def __str__(self):
         return str(self.label)
+
+
+class Entry(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='entries'
+    )
+    period = models.ForeignKey(
+        Period, on_delete=models.CASCADE, related_name='entries', null=True, blank=True
+    )
+    metric = models.ForeignKey(Metric, on_delete=models.CASCADE, related_name='entries')
+    option = models.ForeignKey(
+        MetricOption, on_delete=models.CASCADE, related_name='entries'
+    )
+    entry_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'entry_date']),
+        ]
+
+    def clean(self):
+        if not self.metric.multiple:
+            exists = (
+                Entry.objects.filter(
+                    entry_date=self.entry_date, metric=self.metric, user=self.user
+                )
+                .exclude(pk=self.pk)
+                .exists()
+            )
+
+            if exists:
+                raise ValidationError(
+                    f'{self.metric.slug} already registered for {self.entry_date}'
+                )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.user} - {self.metric.slug} - {self.entry_date}'

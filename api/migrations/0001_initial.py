@@ -87,16 +87,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                'indexes': [
-                    models.Index(
-                        fields=['metric'], name='api_metrico_metric__3c6895_idx'
-                    ),
-                    models.Index(
-                        fields=['user'], name='api_metrico_user_id_226599_idx'
-                    ),
-                ],
-            },
         ),
         migrations.CreateModel(
             name='Period',
@@ -122,13 +112,77 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                'indexes': [
-                    models.Index(
-                        fields=['user', 'start_date'],
-                        name='api_period_user_id_22ed1c_idx',
-                    )
-                ],
-            },
+        ),
+        migrations.CreateModel(
+            name='Entry',
+            fields=[
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
+                ('entry_date', models.DateField()),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    'user',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='entries',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'metric',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='entries',
+                        to='api.metric',
+                    ),
+                ),
+                (
+                    'option',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='entries',
+                        to='api.metricoption',
+                    ),
+                ),
+                (
+                    'period',
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='entries',
+                        to='api.period',
+                    ),
+                ),
+            ],
+        ),
+        migrations.AddIndex(
+            model_name='metricoption',
+            index=models.Index(
+                fields=['metric'], name='api_metrico_metric__3c6895_idx'
+            ),
+        ),
+        migrations.AddIndex(
+            model_name='metricoption',
+            index=models.Index(fields=['user'], name='api_metrico_user_id_226599_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='period',
+            index=models.Index(
+                fields=['user', 'start_date'], name='api_period_user_id_22ed1c_idx'
+            ),
+        ),
+        migrations.AddIndex(
+            model_name='entry',
+            index=models.Index(
+                fields=['user', 'entry_date'], name='api_entry_user_id_b12587_idx'
+            ),
         ),
     ]

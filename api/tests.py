@@ -4,7 +4,7 @@ import pytest
 from django.core.exceptions import ValidationError
 from pytest import mark
 
-from .models import Metric, MetricOption, Period, User
+from .models import Entry, Metric, MetricOption, Period, User
 
 
 def test_api_health(client):
@@ -42,6 +42,32 @@ def test_period_dates_validation():
 
 
 @mark.django_db
+def test_entry_validation():
+    user = create_user()
+    metric = create_metric()
+    option = create_option(metric)
+
+    entry = Entry(
+        user=user,
+        metric=metric,
+        option=option,
+        entry_date=date(2026, 3, 2),
+    )
+    entry.save()
+
+    assert str(entry) == f'{user} - {metric.slug} - {entry.entry_date}'
+
+    entry = Entry(
+        user=user,
+        metric=metric,
+        option=option,
+        entry_date=date(2026, 3, 2),
+    )
+    with pytest.raises(ValidationError):
+        entry.full_clean()
+
+
+@mark.django_db
 def test_period_creation():
     user = create_user()
 
@@ -61,3 +87,31 @@ def test_metric_creation():
 @mark.django_db
 def test_metric_option_creation():
     assert str(create_option(create_metric(), 'label')) == 'label'
+
+
+@mark.django_db
+def test_multiple_metric():
+    user = create_user()
+
+    metric = create_metric('food', True)
+    option1 = create_option(metric, 'Apple')
+    option2 = create_option(metric, 'Banana')
+
+    entry1 = Entry(
+        user=user,
+        metric=metric,
+        option=option1,
+        entry_date=date(2026, 3, 2),
+    )
+    entry2 = Entry(
+        user=user,
+        metric=metric,
+        option=option2,
+        entry_date=date(2026, 3, 2),
+    )
+    entry1.full_clean()
+    entry2.full_clean()
+    entry1.save()
+    entry2.save()
+
+    assert Entry.objects.filter(metric=metric).count() == 2
