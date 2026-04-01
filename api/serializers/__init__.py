@@ -1,3 +1,3 @@
-from .metric import MetricSerializer
+from .metric import MetricListSerializer, MetricRetrieveSerializer
 
-__all__ = ['MetricSerializer']
+__all__ = ['MetricListSerializer', 'MetricRetrieveSerializer']

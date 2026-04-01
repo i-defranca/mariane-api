@@ -1,11 +1,15 @@
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from api.models import Metric
-from api.serializers import MetricSerializer
+from api.serializers import MetricListSerializer, MetricRetrieveSerializer
 
 
 class MetricViewSet(ReadOnlyModelViewSet):
-    queryset = Metric.objects.all().order_by('slug')
-    serializer_class = MetricSerializer
+    queryset = Metric.objects.all().prefetch_related('options').order_by('slug')
 
     lookup_field = 'slug'
+
+    def get_serializer_class(self):  # type: ignore[override]
+        if self.action == 'retrieve':
+            return MetricRetrieveSerializer
+        return MetricListSerializer
