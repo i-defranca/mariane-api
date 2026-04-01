@@ -88,9 +88,13 @@ python manage.py runserver
 - Start the development server
 
 ## Roadmap
+- ~~Add Docker~~
+- ~~Add Django~~
+- ~~Add GitHub CI workflow~~
+- ~~Add tests and coverage~~
 - Add JWT auth
 - Add API docs
-- Add black/ruff to CI workflow
+- ~~Add black/ruff to CI workflow~~
 - Add slow query/request logging
 - Add caching
 - Add anomaly detection (eg. large cycle variance)
