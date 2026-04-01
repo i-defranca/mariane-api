@@ -3,7 +3,6 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -127,25 +126,6 @@ class Entry(models.Model):
         indexes = [
             models.Index(fields=['user', 'entry_date']),
         ]
-
-    def clean(self):
-        if not self.metric.multiple:
-            exists = (
-                Entry.objects.filter(
-                    entry_date=self.entry_date, metric=self.metric, user=self.user
-                )
-                .exclude(pk=self.pk)
-                .exists()
-            )
-
-            if exists:
-                raise ValidationError(
-                    f'{self.metric.slug} already registered for {self.entry_date}'
-                )
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.user} - {self.metric.slug} - {self.entry_date}'

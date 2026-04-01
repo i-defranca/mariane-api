@@ -1,11 +1,35 @@
 from datetime import date, timedelta
+from random import choice
+from string import ascii_lowercase as asc
 
 from api.models import Metric, MetricOption, User
-from api.services import create_period
+from api.services import create_entry, create_period
 
 
-def new_user(username='username'):
+def lorem(len=4):
+    return ''.join(choice(asc) for _ in range(len))
+
+
+def new_user(username=None, empty=False):
+    if not username and not empty:
+        username = lorem(8)
     return User.objects.create_user(username=username)
+
+
+def new_entry(user=None, metric=None, option=None, entry_date=None):
+    if not user:
+        user = new_user()
+    if not metric:
+        metric = new_metric()
+    if not option:
+        option = new_option(metric)
+
+    return create_entry(
+        user=user,  # type: ignore
+        metric=metric,  # type: ignore
+        option=option,  # type: ignore
+        entry_date=entry_date,  # type: ignore
+    )
 
 
 def new_period(user=None, start=None, end=None):
@@ -34,12 +58,14 @@ def new_empty_period(user=None, start=None, end=None):
     )
 
 
-def new_metric(slug='mood', multiple=False):
+def new_metric(slug=None, multiple=False):
+    if not slug:
+        slug = lorem()
     return Metric.objects.create(slug=slug, multiple=multiple)
 
 
-def new_option(metric, label='Happy'):
-    return MetricOption.objects.create(label=label, metric=metric)
+def new_option(metric, label='Happy', user=None):
+    return MetricOption.objects.create(label=label, metric=metric, user=user)
 
 
 def new_user_cycle(day):
