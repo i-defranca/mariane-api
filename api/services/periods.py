@@ -35,3 +35,26 @@ def create_period(user, start_date=None, end_date=None):
     return link_entries(
         Period.objects.create(user=user, start_date=start_date, end_date=end_date)
     )
+
+
+@transaction.atomic
+def update_period(p, **changes):
+    for k, v in changes.items():
+        setattr(p, k, v)
+
+    if p.start_date and p.end_date and p.end_date <= p.start_date:
+        raise ValidationError('Start date must be before end!')
+
+    if (
+        p.user.periods.filter(
+            start_date__lte=p.end_date or date.max,
+            end_date__gte=p.start_date or date.min,
+        )
+        .exclude(pk=p.pk)
+        .exists()
+    ):
+        raise ValidationError('Periods cannot overlap!')
+
+    p.save()
+
+    return link_entries(p)

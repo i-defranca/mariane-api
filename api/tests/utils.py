@@ -3,7 +3,7 @@ from random import choice
 from string import ascii_lowercase as asc
 
 from api.models import Metric, User
-from api.services import create_entry, create_option, create_period
+from api.services import create_entry, create_option, create_period, update_period
 
 
 def lorem(len=4):
@@ -56,6 +56,15 @@ def new_empty_period(user=None, start=None, end=None):
         start_date=start,  # type: ignore
         end_date=end,  # type: ignore
     )
+
+
+def upd_period(period, start=None, end=None):
+    changes = {}
+    if start:
+        changes['start_date'] = start
+    if end:
+        changes['end_date'] = end
+    return update_period(period, **changes)  # type: ignore
 
 
 def new_metric(slug=None, multiple=False, custom=True):
