@@ -2,8 +2,8 @@ from datetime import date, timedelta
 from random import choice
 from string import ascii_lowercase as asc
 
-from api.models import Metric, MetricOption, User
-from api.services import create_entry, create_period
+from api.models import Metric, User
+from api.services import create_entry, create_option, create_period
 
 
 def lorem(len=4):
@@ -58,14 +58,16 @@ def new_empty_period(user=None, start=None, end=None):
     )
 
 
-def new_metric(slug=None, multiple=False):
+def new_metric(slug=None, multiple=False, custom=True):
     if not slug:
         slug = lorem()
-    return Metric.objects.create(slug=slug, multiple=multiple)
+    return Metric.objects.create(slug=slug, custom=custom, multiple=multiple)
 
 
-def new_option(metric, label='Happy', user=None):
-    return MetricOption.objects.create(label=label, metric=metric, user=user)
+def new_option(metric=None, label=None, user=None, empty=False):
+    if not label and not empty:
+        label = lorem()
+    return create_option(user=user, metric=metric, label=label)  # type: ignore
 
 
 def new_user_cycle(day):

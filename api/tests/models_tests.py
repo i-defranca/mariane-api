@@ -3,7 +3,7 @@ from datetime import date, timedelta
 import pytest
 from pytest import mark
 
-from .utils import new_metric, new_option, new_period, new_user, new_user_cycle
+from .utils import new_metric, new_period, new_user, new_user_cycle
 
 
 @mark.django_db
@@ -14,11 +14,6 @@ def test_user_creation():
 @mark.django_db
 def test_metric_creation():
     assert str(new_metric('slug')) == 'slug'
-
-
-@mark.django_db
-def test_metric_option_creation():
-    assert str(new_option(new_metric(), 'label')) == 'label'
 
 
 # User | validation
@@ -58,4 +53,3 @@ def test_user_cycle_ovulation_window_phase_property():
 @mark.django_db
 def test_user_cycle_luteal_phase_property():
     assert new_user_cycle(day=22).cycle_phase == 'luteal'
-

@@ -14,7 +14,7 @@ def create_period(user, start_date=None, end_date=None):
     if start_date and end_date and end_date <= start_date:
         raise ValidationError('Start date must be before end!')
 
-    if user.periods.filter(end_date__isnull=True).count() > 0:
+    if user.periods.filter(end_date__isnull=True).exists():
         raise ValidationError('You already have an open period!')
 
     if user.periods.filter(
