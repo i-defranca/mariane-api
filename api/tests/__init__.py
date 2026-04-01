@@ -1,4 +1,5 @@
 from .utils import (
+    lorem,
     new_empty_period,
     new_entry,
     new_metric,
@@ -18,4 +19,5 @@ __all__ = [
     'new_user',
     'new_user_cycle',
     'upd_period',
+    'lorem',
 ]
