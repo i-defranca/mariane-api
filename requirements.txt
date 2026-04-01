@@ -9,6 +9,8 @@ django-cors-headers==4.9.0
 django-ipware==7.0.1
 django-structlog==10.0.0
 djangorestframework==3.17.1
+djangorestframework_simplejwt==5.5.1
+djangorestframework-simplejwt[crypto]
 filelock==3.25.2
 identify==2.6.18
 iniconfig==2.3.0
@@ -21,6 +23,7 @@ platformdirs==4.9.4
 pluggy==1.6.0
 pre_commit==4.5.1
 Pygments==2.20.0
+PyJWT==2.12.1
 pytest==9.0.2
 pytest-cov==7.1.0
 pytest-django==4.12.0
