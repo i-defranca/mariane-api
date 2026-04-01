@@ -75,10 +75,6 @@ class Period(models.Model):
     class Meta:
         indexes = [models.Index(fields=['user', 'start_date'])]
 
-    def clean(self):
-        if not self.start_date and not self.end_date:
-            raise ValidationError('At least one date is required!')
-
     def __str__(self):
         return f'{self.user} - {self.start_date}'
 
