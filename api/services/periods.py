@@ -3,7 +3,17 @@ from datetime import date
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from api.models import Period
+from api.models import Entry, Period
+
+
+def link_entries(p):
+    Entry.objects.filter(
+        entry_date__gte=p.start_date or date.min,
+        entry_date__lte=p.end_date or date.max,
+        user=p.user,
+    ).update(period=p)
+
+    return p
 
 
 @transaction.atomic
@@ -22,4 +32,6 @@ def create_period(user, start_date=None, end_date=None):
     ).exists():
         raise ValidationError('Periods cannot overlap!')
 
-    return Period.objects.create(user=user, start_date=start_date, end_date=end_date)
+    return link_entries(
+        Period.objects.create(user=user, start_date=start_date, end_date=end_date)
+    )

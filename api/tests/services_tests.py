@@ -75,6 +75,26 @@ def test_period_overlap_validation():
         new_period(user, start=date(2026, 1, 15))
 
 
+# Period | entries linking
+@mark.django_db
+def test_period_entries_linking_on_creation():
+    user = new_user()
+    entry = new_entry(user, new_metric())
+    other_user_entry = new_entry(new_user(), new_metric())
+
+    assert entry.period is None
+    assert other_user_entry.period is None
+
+    period = new_period(user)
+    new_period(new_user())
+
+    entry.refresh_from_db()
+    other_user_entry.refresh_from_db()
+
+    assert entry.period.pk == period.pk
+    assert other_user_entry.period is None
+
+
 # Entry | validations
 @mark.django_db
 def test_entry_future_date_validation():
