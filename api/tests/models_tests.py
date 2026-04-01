@@ -3,7 +3,7 @@ from datetime import date, timedelta
 import pytest
 from pytest import mark
 
-from .utils import new_metric, new_period, new_user, new_user_cycle
+from api.tests import new_metric, new_period, new_user, new_user_cycle
 
 
 @mark.django_db
