@@ -1,3 +1,4 @@
+from datetime import date
 from uuid import uuid4
 
 from django.conf import settings
@@ -23,6 +24,40 @@ class User(AbstractBaseUser):
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'username'
+
+    @property
+    def cycle_day(self):
+        today = date.today()
+
+        last = (
+            self.periods.filter(start_date__lte=today)
+            .order_by('-start_date')
+            .values_list('start_date', flat=True)
+            .first()
+            or today
+        )
+
+        return (today - last).days + 1
+
+    @property
+    def cycle_phase(self):
+        avg = round(
+            self.periods.filter(start_date__isnull=False, end_date__isnull=False)
+            .aggregate(
+                avg_days=models.Avg(models.F('end_date') - models.F('start_date'))
+            )['avg_days']
+            .total_seconds()
+            / 86400,
+            2,
+        )
+        if self.cycle_day <= int(avg * 0.2):
+            return 'menstrual'
+        elif self.cycle_day <= int(avg * 0.6):
+            return 'follicular'
+        elif self.cycle_day <= int(avg * 0.7):
+            return 'ovulation window'
+        else:
+            return 'luteal'
 
     def __str__(self):
         return self.username

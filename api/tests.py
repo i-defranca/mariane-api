@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 from django.core.exceptions import ValidationError
@@ -33,6 +33,48 @@ def test_username_validation():
 @mark.django_db
 def test_user_creation():
     assert str(create_user('username')) == 'username'
+
+
+@mark.django_db
+def test_user_cycle_day_property():
+    user = create_user()
+    Period.objects.create(user=user, start_date=date.today() - timedelta(days=5))
+
+    assert user.cycle_day == 6
+
+    Period.objects.create(user=user, start_date=date.today())
+    assert user.cycle_day == 1
+
+
+def create_user_cycle(day):
+    user = create_user()
+
+    Period.objects.create(
+        user=user, start_date=date(2026, 1, 1), end_date=date(2026, 1, 31)
+    )  # avg 30
+    Period.objects.create(user=user, start_date=date.today() - timedelta(days=day - 1))
+
+    return user
+
+
+@mark.django_db
+def test_user_cycle_menstrual_phase_property():
+    assert create_user_cycle(day=6).cycle_phase == 'menstrual'
+
+
+@mark.django_db
+def test_user_cycle_follicular_phase_property():
+    assert create_user_cycle(day=18).cycle_phase == 'follicular'
+
+
+@mark.django_db
+def test_user_cycle_ovulation_window_phase_property():
+    assert create_user_cycle(day=21).cycle_phase == 'ovulation window'
+
+
+@mark.django_db
+def test_user_cycle_luteal_phase_property():
+    assert create_user_cycle(day=22).cycle_phase == 'luteal'
 
 
 @mark.django_db
