@@ -14,13 +14,8 @@ class MetricRetrieveSerializer(serializers.ModelSerializer):
     options = serializers.SerializerMethodField()
 
     def get_options(self, obj):
-        opts = obj.options
         user = self.context['request'].user
-
-        global_f = Q(user__isnull=True)
-        user_f = Q(user=user) | global_f
-
-        opts = opts.filter(user_f if user.is_authenticated else global_f)
+        opts = obj.options.filter(Q(user=user) | Q(user__isnull=True))
 
         return [{'id': v.id, 'label': v.label} for v in opts]
 

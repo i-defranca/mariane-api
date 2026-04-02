@@ -2,6 +2,8 @@ from datetime import date, timedelta
 from random import choice
 from string import ascii_lowercase as asc
 
+from rest_framework.test import APIClient
+
 from api.models import Metric, User
 from api.services import create_entry, create_option, create_period, update_period
 
@@ -90,3 +92,23 @@ def new_user_cycle(day):
     new_empty_period(user, date.today() - timedelta(days=day - 1), None)
 
     return user
+
+
+def get_client(token=None):
+    client = APIClient()
+
+    if token is None:
+        token = lorem(255)
+    if token:
+        client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+    return client
+
+
+def get_login():
+    pwd = lorem(8)
+    user = new_user(password=pwd)
+    body = {'username': user.username, 'password': pwd}
+
+    response = get_client('').post('/api/auth/token/login/', body, format='json')
+    return user, response, response.json()

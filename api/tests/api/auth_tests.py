@@ -1,24 +1,12 @@
 from pytest import mark
-from rest_framework.test import APIClient
 
-from api.tests import lorem, new_user
+from api.tests import get_client, get_login, lorem, new_user
 
 url = '/api/auth/token/'
 
 
 def user_url():
     return url.replace('token', 'user')
-
-
-def get_client(token=None):
-    client = APIClient()
-
-    if token is None:
-        token = lorem(255)
-    if token:
-        client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
-
-    return client
 
 
 def test_unprotected_route_empty_token():
@@ -31,18 +19,9 @@ def test_unprotected_route_invalid_token():
     assert response.status_code == 200
 
 
-def login():
-    pwd = lorem(8)
-    user = new_user(password=pwd)
-    body = {'username': user.username, 'password': pwd}
-
-    response = get_client('').post(f'{url}login/', body, format='json')
-    return response, response.json()
-
-
 @mark.django_db
 def test_token_login_success():
-    res, data = login()
+    _, res, data = get_login()
 
     assert res.status_code == 200
     assert 'access' in data
@@ -51,7 +30,7 @@ def test_token_login_success():
 
 @mark.django_db
 def test_unprotected_route_valid_token():
-    _, data = login()
+    _, _, data = get_login()
 
     response = get_client(data['access']).get('/api/')
     assert response.status_code == 200
@@ -79,7 +58,7 @@ def test_token_login_invalid():
 
 @mark.django_db
 def test_token_refresh_success():
-    _, data = login()
+    _, _, data = get_login()
 
     response = get_client().post(
         f'{url}refresh/', {'refresh': data['refresh']}, format='json'
@@ -97,7 +76,7 @@ def test_token_refresh_invalid():
 
 @mark.django_db
 def test_token_refresh_logout_success():
-    _, data = login()
+    _, _, data = get_login()
 
     response = get_client().post(
         f'{url}logout/', {'refresh': data['refresh']}, format='json'
@@ -112,7 +91,7 @@ def test_token_refresh_logout_success():
 
 @mark.django_db
 def test_token_valid():
-    _, data = login()
+    _, _, data = get_login()
 
     response = get_client(data['access']).get(user_url())
     assert response.status_code == 200
@@ -129,6 +108,6 @@ def test_protected_route_empty_token():
 
 @mark.django_db
 def test_protected_route_invalid_token():
-    login()
+    get_login()
 
     assert get_client().get(user_url()).status_code == 401
