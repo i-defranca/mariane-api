@@ -8,4 +8,6 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView as TokenRefresh,
 )
 
-__all__ = ['TokenLogin', 'TokenLogout', 'TokenRefresh']
+from .views import AuthUserView as AuthUser
+
+__all__ = ['AuthUser', 'TokenLogin', 'TokenLogout', 'TokenRefresh']
