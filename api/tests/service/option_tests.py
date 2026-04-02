@@ -23,7 +23,7 @@ def test_option_empty_metric_validation():
 @mark.django_db
 def test_option_empty_label_validation():
     with pytest.raises(ValidationError):
-        new_option(new_metric(), empty=True)
+        new_option(new_metric(), '')
 
 
 @mark.django_db
