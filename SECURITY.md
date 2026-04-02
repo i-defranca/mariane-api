@@ -28,10 +28,13 @@ This application handles sensitive health data (menstrual cycle tracking). We ta
 - **User Data**: Follow GDPR and similar privacy regulations when handling user information
 
 ### Authentication & Authorization
-- JWT authentication is planned (see [Roadmap](README.md#roadmap))
-- Until JWT is implemented, ensure proper access controls are in place
+- JWT Authentication is now implemented for secure access control
+  - Use Bearer tokens in the `Authorization` header to authenticate API requests
+  - Tokens should be securely stored client-side (e.g., in HTTP-only cookies or secure storage)
+  - JWTs should have appropriate expiration times, and tokens should be refreshed periodically using a refresh token mechanism
+  - Use strong signing algorithms (e.g., RS256) for JWTs
 - Validate all user inputs on both client and server sides
-- Implement proper permission checks for all API endpoints
+- Implement proper permission checks for all API endpoints to ensure users can only access authorized resources
 
 ### Dependencies
 - Keep dependencies up to date by regularly running `pip list --outdated`
@@ -41,7 +44,7 @@ This application handles sensitive health data (menstrual cycle tracking). We ta
 ### Environment & Configuration
 - **Never commit `.env` files** or other files containing secrets to the repository
 - Use `.env.example` to document required environment variables without exposing sensitive values
-- Rotate database passwords periodically
+- Rotate JWT signing keys periodically
 - Use strong, unique passwords for database access
 
 ### Database Security
@@ -52,10 +55,10 @@ This application handles sensitive health data (menstrual cycle tracking). We ta
 - Consider encrypting sensitive fields at rest
 
 ### API Security
-- Implement rate limiting to prevent brute-force attacks
-- Validate and sanitize all user inputs
+- Implement rate limiting to prevent brute-force attacks on authentication endpoints
+- Validate and sanitize all user inputs to prevent injection attacks
 - Enable SQL injection prevention (Django ORM provides this by default)
-- Add API authentication before production deployment
+- Ensure JWT validation is correctly implemented and enforced on all protected endpoints
 - Log and monitor suspicious activity
 
 ### Testing & Code Quality
@@ -89,12 +92,11 @@ This application handles sensitive health data (menstrual cycle tracking). We ta
    - Keep this file updated as security practices evolve
 
 ## Known Security Limitations
-- JWT authentication is not yet implemented (planned feature)
 - API documentation is still in development
 - Production deployment guidelines are needed
 
 ## Future Security Improvements
-- [ ] Implement JWT authentication
+- [x] Implement JWT authentication
 - [ ] Add API rate limiting
 - [ ] Add comprehensive API logging and monitoring
 - [ ] Add anomaly detection for security events
@@ -109,7 +111,7 @@ This application handles sensitive health data (menstrual cycle tracking). We ta
 
 ## Version
 - Created: 2026-04-01
-- Last Updated: 2026-04-01
+- Last Updated: 2026-04-02
 
 ---
 **Questions or suggestions?** Please reach out to the repository maintainer or open a private discussion.
