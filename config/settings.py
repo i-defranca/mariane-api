@@ -51,10 +51,8 @@ DJANGO_STRUCTLOG = {'REQUEST_ID_HEADER': 'HTTP_X_REQUEST_ID'}
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': ('api.permissions.AuthPermission',),
+    'DEFAULT_AUTHENTICATION_CLASSES': ('api.authentication.OptionalAuth',),
+    'DEFAULT_PERMISSION_CLASSES': ('api.authentication.DefaultPermission',),
 }
 
 SIMPLE_JWT = {
