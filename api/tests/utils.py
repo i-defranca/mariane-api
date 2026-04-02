@@ -10,10 +10,13 @@ def lorem(len=4):
     return ''.join(choice(asc) for _ in range(len))
 
 
-def new_user(username=None, empty=False):
-    if not username and not empty:
+def new_user(username=None, password=None):
+    if username is None:
         username = lorem(8)
-    return User.objects.create_user(username=username)
+    if password is not None:
+        return User.objects.create_user(username=username, password=password)
+    else:
+        return User.objects.create_user(username=username)
 
 
 def new_entry(user=None, metric=None, option=None, entry_date=None):
@@ -73,8 +76,8 @@ def new_metric(slug=None, multiple=False, custom=True):
     return Metric.objects.create(slug=slug, custom=custom, multiple=multiple)
 
 
-def new_option(metric=None, label=None, user=None, empty=False):
-    if not label and not empty:
+def new_option(metric=None, label=None, user=None):
+    if label is None:
         label = lorem()
     return create_option(user=user, metric=metric, label=label)  # type: ignore
 

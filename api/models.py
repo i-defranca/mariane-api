@@ -40,15 +40,15 @@ class User(AbstractBaseUser):
 
     @property
     def cycle_phase(self):
-        avg = round(
-            self.periods.filter(start_date__isnull=False, end_date__isnull=False)
-            .aggregate(
-                avg_days=models.Avg(models.F('end_date') - models.F('start_date'))
-            )['avg_days']
-            .total_seconds()
-            / 86400,
-            2,
-        )
+        delta = self.periods.filter(
+            start_date__isnull=False, end_date__isnull=False
+        ).aggregate(avg_days=models.Avg(models.F('end_date') - models.F('start_date')))[
+            'avg_days'
+        ]
+        if not delta:
+            return 'no enough info'
+
+        avg = round(delta.total_seconds() / 86400, 2)
         if self.cycle_day <= int(avg * 0.2):
             return 'menstrual'
         elif self.cycle_day <= int(avg * 0.6):

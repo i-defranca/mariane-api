@@ -20,7 +20,7 @@ def test_metric_creation():
 @mark.django_db
 def test_username_validation():
     with pytest.raises(ValueError):
-        new_user(None, True)
+        new_user('')
 
 
 # User | properties
