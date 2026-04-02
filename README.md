@@ -93,7 +93,7 @@ python manage.py runserver
 - ~~Add GitHub CI workflow~~
 - ~~Add tests and coverage~~
 - ~~Add JWT auth~~
-- Add API docs
+- ~~Add API docs~~
 - ~~Add black/ruff to CI workflow~~
 - Add slow query/request logging
 - Add caching

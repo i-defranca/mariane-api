@@ -92,7 +92,6 @@ This application handles sensitive health data (menstrual cycle tracking). We ta
    - Keep this file updated as security practices evolve
 
 ## Known Security Limitations
-- API documentation is still in development
 - Production deployment guidelines are needed
 
 ## Future Security Improvements
