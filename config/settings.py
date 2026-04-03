@@ -28,6 +28,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'corsheaders',
+    'django_filters',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
@@ -51,11 +52,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 DJANGO_STRUCTLOG = {'REQUEST_ID_HEADER': 'HTTP_X_REQUEST_ID'}
 
 REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
     'DEFAULT_AUTHENTICATION_CLASSES': ('api.authentication.OptionalAuth',),
-    'DEFAULT_PERMISSION_CLASSES': ('api.authentication.DefaultPermission',),
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PARSER_CLASSES': ['rest_framework.parsers.JSONParser'],
+    'DEFAULT_PERMISSION_CLASSES': ('api.authentication.DefaultPermission',),
+    'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'TEST_REQUEST_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer'],
 }
