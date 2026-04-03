@@ -55,6 +55,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('api.authentication.OptionalAuth',),
     'DEFAULT_PERMISSION_CLASSES': ('api.authentication.DefaultPermission',),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PARSER_CLASSES': ['rest_framework.parsers.JSONParser'],
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'TEST_REQUEST_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer'],
 }
 
 SIMPLE_JWT = {

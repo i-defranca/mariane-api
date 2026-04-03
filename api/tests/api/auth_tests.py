@@ -39,7 +39,7 @@ def test_unprotected_route_valid_token():
 @mark.django_db
 def test_token_login_invalid():
     def post_login(body):
-        return get_client('').post(f'{url}login/', body, format='json')
+        return get_client('').post(f'{url}login/', body)
 
     user = new_user()
 
@@ -60,17 +60,13 @@ def test_token_login_invalid():
 def test_token_refresh_success():
     _, _, data = get_login()
 
-    response = get_client().post(
-        f'{url}refresh/', {'refresh': data['refresh']}, format='json'
-    )
+    response = get_client().post(f'{url}refresh/', {'refresh': data['refresh']})
     assert response.status_code == 200
     assert 'access' in response.json()
 
 
 def test_token_refresh_invalid():
-    response = get_client().post(
-        f'{url}refresh/', {'refresh': lorem(255)}, format='json'
-    )
+    response = get_client().post(f'{url}refresh/', {'refresh': lorem(255)})
     assert response.status_code == 401
 
 
@@ -78,14 +74,10 @@ def test_token_refresh_invalid():
 def test_token_refresh_logout_success():
     _, _, data = get_login()
 
-    response = get_client().post(
-        f'{url}logout/', {'refresh': data['refresh']}, format='json'
-    )
+    response = get_client().post(f'{url}logout/', {'refresh': data['refresh']})
     assert response.status_code == 200
 
-    response = get_client().post(
-        f'{url}refresh/', {'refresh': data['refresh']}, format='json'
-    )
+    response = get_client().post(f'{url}refresh/', {'refresh': data['refresh']})
     assert response.status_code == 401
 
 

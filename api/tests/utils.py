@@ -110,5 +110,5 @@ def get_login():
     user = new_user(password=pwd)
     body = {'username': user.username, 'password': pwd}
 
-    response = get_client('').post('/api/auth/token/login/', body, format='json')
+    response = get_client('').post('/api/auth/token/login/', body)
     return user, response, response.json()
