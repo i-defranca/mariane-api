@@ -22,11 +22,11 @@ def new_user(username=None, password=None):
 
 
 def new_entry(user=None, metric=None, option=None, entry_date=None):
-    if not user:
+    if user is None:
         user = new_user()
-    if not metric:
+    if metric is None:
         metric = new_metric()
-    if not option:
+    if option is None:
         option = new_option(metric)
 
     return create_entry(
