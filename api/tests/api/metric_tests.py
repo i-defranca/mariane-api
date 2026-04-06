@@ -43,7 +43,7 @@ def test_retrieve(api, url, user, metric, option):
     assert isinstance(data['options'], list)
     assert len(data['options']) == 2
 
-    assert any(i['label'] == g_opt.label for i in data['options'])
-    assert any(i['label'] == option.obj.label for i in data['options'])
+    assert any(i == g_opt.label for i in data['options'])
+    assert any(i == option.obj.label for i in data['options'])
 
-    assert not any(i['label'] == u_opt.label for i in data['options'])
+    assert not any(i == u_opt.label for i in data['options'])
