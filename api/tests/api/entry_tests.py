@@ -1,5 +1,7 @@
 import pytest
 
+from api.models import Entry
+
 
 @pytest.fixture
 def basename():
@@ -56,3 +58,23 @@ def test_list_period_filter(api, url, entry, period, assert_list_size):
     assert_list_size(api.get(f'{url}&period=false'), 0)
 
     assert_list_size(api.get(f'{url}&period=true'), 2)
+
+
+def test_create(api, basename, user, metric, option, period, today):
+    period.create()
+
+    body = {'metric': metric.obj.slug, 'option': option.obj.label}
+    res = api.post(basename, body)
+
+    assert res.status_code == 201
+    data = res.json()
+
+    assert data['metric'] == metric.obj.slug
+    assert data['option'] == option.obj.label
+    assert data['entry_date'] == today().isoformat()
+    assert data['period']['end_date'] == str(period.obj.end_date)
+    assert data['period']['start_date'] == str(period.obj.start_date)
+
+    last = Entry.objects.all().last()
+
+    assert last.user.pk == user.obj.pk
