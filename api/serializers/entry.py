@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api.models import Entry, Period
+from api.models import Entry, Metric, MetricOption, Period
 
 
 class PeriodSerializer(serializers.ModelSerializer):
@@ -17,3 +17,18 @@ class EntryListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entry
         fields = ['metric', 'option', 'period', 'entry_date', 'created_at']
+
+
+class EntryCreateSerializer(serializers.Serializer):
+    metric = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Metric.objects.all()
+    )
+    option = serializers.SlugRelatedField(
+        slug_field='label', queryset=MetricOption.objects.all()
+    )
+    entry_date = serializers.DateField(required=False)
+
+    def validate(self, attrs):
+        attrs['user'] = self.context['request'].user
+
+        return attrs
