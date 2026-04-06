@@ -33,8 +33,10 @@ class User(AbstractBaseUser):
             .order_by('-start_date')
             .values_list('start_date', flat=True)
             .first()
-            or today
         )
+
+        if not last:
+            return 0
 
         return (today - last).days + 1
 
@@ -128,4 +130,4 @@ class Entry(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.user} - {self.metric.slug} - {self.entry_date}'
+        return f'{self.user} - {self.metric} - {self.entry_date}'
