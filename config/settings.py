@@ -76,6 +76,8 @@ SIMPLE_JWT = {
     'USER_ID_CLAIM': 'user_id',
 }
 
+PUBLIC_PATHS = [r'^/api/auth/token/', r'^/api/$']
+
 SPECTACULAR_SETTINGS = {
     'TITLE': os.getenv('APP_TITLE'),
     'DESCRIPTION': 'API documentation',
