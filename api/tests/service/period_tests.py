@@ -1,148 +1,112 @@
-from datetime import date, timedelta
-
 import pytest
 from django.core.exceptions import ValidationError
-from pytest import mark
 
 from api.models import Period
-from api.tests import (
-    new_empty_period,
-    new_entry,
-    new_metric,
-    new_period,
-    new_user,
-    upd_period,
-)
 
 
-@mark.django_db
-def test_creation():
-    user = new_user()
-    period = new_period(user)
+def test_creation(user, period, today):
+    period.create(user=user.obj)
+    period.create(user=(other := user.create()))
+    period.create(user=user.obj, start_date=today(5), end_date=today(9))
 
-    assert Period.objects.count() == 1
-    assert str(period) == f'{user} - {period.start_date}'
-
-
-# update
-@mark.django_db
-def test_start_date_update():
-    user = new_user()
-    period = new_period(user)
-
-    start = date.today() - timedelta(days=1)
-    upd_period(period, start=start)
-
-    assert Period.objects.count() == 1
-    period.refresh_from_db()
-    assert period.start_date == start
+    assert Period.objects.count() == 3
+    assert Period.objects.filter(user=other).count() == 1
+    assert Period.objects.filter(user=user.obj).count() == 2
 
 
-@mark.django_db
-def test_end_date_update():
-    user = new_user()
-    period = new_period(user)
+def test_update(period, today):
+    period.create()
 
-    end = date.today() + timedelta(days=2)
-    upd_period(period, end=end)
+    period.update(start_date=today(-1))
+    period.obj.refresh_from_db()
+    assert period.obj.start_date == today(-1)
 
-    assert Period.objects.count() == 1
-    period.refresh_from_db()
-    assert period.end_date == end
+    period.update(end_date=today(2))
+    period.obj.refresh_from_db()
+    assert period.obj.end_date == today(2)
+
+    period.update(start_date=today(-2), end_date=today(1))
+    period.obj.refresh_from_db()
+    assert period.obj.end_date == today(1)
+    assert period.obj.start_date == today(-2)
 
 
-# validations
-@mark.django_db
-def test_dates_filled_validation():
+def test_dates_filled_validation(period):
+    # TODO: {error:'dates_required'}
     with pytest.raises(ValidationError):
-        new_empty_period()
+        period.create(start_date=None, end_date=None)
 
 
-@mark.django_db
-def test_creation_dates_ordering_validation():
+def test_creation_dates_ordering_validation(period, today):
+    # TODO: {error:'dates_ordering'}
     with pytest.raises(ValidationError):
-        new_period(end=date.today() - timedelta(days=5))
+        period.create(end_date=today(-5))
 
 
-@mark.django_db
-def test_update_dates_ordering_validation():
-    period = new_period()
+def test_update_dates_ordering_validation(period, today):
+    # TODO: {error:'dates_ordering'}
     with pytest.raises(ValidationError):
-        upd_period(period, end=date.today() - timedelta(days=5))
+        period.update(end_date=today(-5))
 
 
-@mark.django_db
-def test_user_has_open_validation():
-    user = new_user()
-    new_empty_period(user, start=date.today(), end=None)
+def test_user_has_open_validation(period):
+    period.create(end_date=None)
+    # TODO: {error:'open_period_exists'}
     with pytest.raises(ValidationError):
-        new_period(user)
+        period.create()
 
 
-@mark.django_db
-def test_creation_overlap_validation():
-    user = new_user()
-
-    new_period(user, start=date(2026, 1, 1), end=date(2026, 1, 20))
+def test_creation_overlap_validation(period):
+    period.create(start_date='2026-01-01', end_date='2026-01-20')
+    # TODO: {error:'periods_overlap'}
     with pytest.raises(ValidationError):
-        new_period(user, start=date(2026, 1, 15))
+        period.create(start_date='2026-01-15', end_date='2026-01-19')
 
 
-@mark.django_db
-def test_update_overlap_validation():
-    user = new_user()
-
-    new_period(user, start=date(2026, 1, 1), end=date(2026, 1, 20))
-    period = new_period(user)
+def test_update_overlap_validation(period):
+    period.create()
+    period.create(start_date='2026-01-01', end_date='2026-01-20')
+    # TODO: {error:'periods_overlap'}
     with pytest.raises(ValidationError):
-        upd_period(period, start=date(2026, 1, 15), end=date(2026, 1, 19))
+        period.update(start_date='2026-01-15', end_date='2026-01-19')
 
 
 # entries linking
-@mark.django_db
-def test_creation_entries_linking():
-    user = new_user()
-    entry = new_entry(user, new_metric())
-    other_user_entry = new_entry(new_user(), new_metric())
+def test_creation_entries_linking(user, entry, period):
+    entry.create()
+    other = entry.create(user=user.create())
 
-    assert entry.period is None
-    assert other_user_entry.period is None
+    assert other.period is None
+    assert entry.obj.period is None
 
-    period = new_period(user)
-    new_period(new_user())
+    period.create()
+    period.create(user=user.create())
 
-    entry.refresh_from_db()
-    other_user_entry.refresh_from_db()
+    other.refresh_from_db()
+    entry.obj.refresh_from_db()
 
-    assert entry.period.pk == period.pk
-    assert other_user_entry.period is None
+    assert other.period is None
+    assert entry.obj.period.pk == period.obj.pk
 
 
-@mark.django_db
-def test_update_entries_linking():
-    user = new_user()
-    dt = date.today() - timedelta(days=20)
-    entry = new_entry(user, new_metric(), entry_date=dt)
-    other_user_entry = new_entry(new_user(), new_metric(), entry_date=dt)
+def test_update_entries_linking(user, entry, period, today):
+    entry.create(entry_date=today(-20))
+    other = entry.create(user=user.create(), entry_date=today(-20))
 
-    assert entry.period is None
-    assert other_user_entry.period is None
+    period.create()
+    other_period = period.create(user=user.create())
 
-    period = new_period(user)
-    other_user_period = new_period(new_user())
+    other.refresh_from_db()
+    entry.obj.refresh_from_db()
 
-    entry.refresh_from_db()
-    other_user_entry.refresh_from_db()
+    assert other.period is None
+    assert entry.obj.period is None
 
-    assert entry.period is None
-    assert other_user_entry.period is None
+    period.update(period=period.obj, start_date=today(-20 - 1))
+    period.update(period=other_period, start_date=today(-20 - 1))
 
-    dtt = dt - timedelta(days=1)
-    upd_period(period, start=dtt)
-    upd_period(other_user_period, start=dtt)
+    other.refresh_from_db()
+    entry.obj.refresh_from_db()
 
-    entry.refresh_from_db()
-    other_user_entry.refresh_from_db()
-
-    assert entry.period.pk == period.pk
-    assert other_user_entry.period is None
+    assert other.period is None
+    assert entry.obj.period.pk == period.obj.pk

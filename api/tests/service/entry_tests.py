@@ -1,82 +1,69 @@
-from datetime import date, timedelta
-
 import pytest
 from django.core.exceptions import ValidationError
-from pytest import mark
 
 from api.models import Entry
-from api.tests import new_entry, new_metric, new_option, new_period, new_user
 
 
-@mark.django_db
-def test_creation():
-    user = new_user()
-    period = new_period(user)
-    metric = new_metric()
+def test_outside_period_creation(entry, today):
+    entry.create()
+    other = entry.create(entry_date=today(-3))
 
-    entry = new_entry(user, metric)
-
-    assert Entry.objects.count() == 1
-    assert entry.period.pk == period.pk
-    assert str(entry) == f'{user} - {metric.slug} - {entry.entry_date}'
+    assert other.period is None
+    assert entry.obj.period is None
+    assert Entry.objects.count() == 2
 
 
-# validations
-@mark.django_db
-def test_future_date_validation():
+def test_inside_period_creation(entry, period):
+    period.create()
+    entry.create()
+
+    assert entry.obj.period.pk == period.obj.pk
+
+
+def test_multiple_metric_creation(entry, metric):
+    metric.create(multiple=True)
+
+    entry.create()
+    entry.create(metric=metric.obj)
+    entry.create(metric=metric.obj)
+
+    assert Entry.objects.filter(metric=metric.obj).count() == 2
+
+
+def test_future_date_validation(entry, today):
+    # TODO: {error:{entry_date:'future'}}
     with pytest.raises(ValidationError):
-        new_entry(entry_date=date.today() + timedelta(days=5))
+        entry.create(entry_date=today(5))
 
 
-@mark.django_db
-def test_option_metric_validation():
+def test_option_metric_validation(entry, metric, option):
+    # TODO: {error:{option:'not_allowed_for_metric'}}
     with pytest.raises(ValidationError):
-        new_entry(option=new_option(new_metric()))
+        entry.create(option=option.create(metric=metric.obj))
 
 
-@mark.django_db
-def test_duplicate_metric_validation():
-    user = new_user()
-    metric = new_metric()
-    new_entry(user, metric)
+def test_duplicate_metric_validation(entry, metric):
+    entry.create(metric=metric.create(multiple=False))
+    # TODO: {error:{metric:'not_multiple'}}
     with pytest.raises(ValidationError):
-        new_entry(user, metric)
+        entry.create(metric=metric.obj)
 
 
-@mark.django_db
-def test_duplicate_option_validation():
-    user = new_user()
-    metric = new_metric(multiple=True)
-    option = new_option(metric)
-    new_entry(user, metric, option)
+def test_duplicate_option_validation(entry, metric, option):
+    entry.create(metric=metric.create(multiple=True))
+    # TODO: {error:{metric:'option_exists'}}
     with pytest.raises(ValidationError):
-        new_entry(user, metric, option)
+        entry.create(metric=metric.obj, option=option.obj)
 
 
-@mark.django_db
-def test_custom_option_ownership_validation():
-    user = new_user()
-    metric = new_metric()
-    option = new_option(metric, user=new_user())
+def test_custom_option_ownership_validation(user, entry, metric, option):
+    option.create()
+    # TODO: {error:{option:'not_owner'}}
     with pytest.raises(ValidationError):
-        new_entry(user, metric, option)
+        entry.create(user=user.create(), metric=metric.obj, option=option.obj)
 
 
-@mark.django_db
-def test_flow_metric_no_period_validation():
-    user = new_user()
-    metric = new_metric('flow')
+def test_flow_metric_no_period_validation(entry, metric):
+    # TODO: {error:{metric:'not_allowed_outside_period'}}
     with pytest.raises(ValidationError):
-        new_entry(user, metric)
-
-
-@mark.django_db
-def test_allow_multiple_metric():
-    user = new_user()
-
-    metric = new_metric('food', True)
-
-    new_entry(user, metric, new_option(metric, 'Apple'))
-    new_entry(user, metric, new_option(metric, 'Banana'))
-
-    assert Entry.objects.filter(metric=metric).count() == 2
+        entry.create(metric=metric.create(slug='flow'))
