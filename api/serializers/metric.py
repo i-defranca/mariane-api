@@ -1,12 +1,6 @@
 from rest_framework import serializers
 
-from api.models import Metric, MetricOption
-
-
-class OptionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MetricOption
-        fields = ['id', 'label']
+from api.models import Metric
 
 
 class MetricListSerializer(serializers.ModelSerializer):
@@ -16,7 +10,7 @@ class MetricListSerializer(serializers.ModelSerializer):
 
 
 class MetricRetrieveSerializer(serializers.ModelSerializer):
-    options = OptionSerializer(many=True, read_only=True)
+    options = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Metric
