@@ -80,3 +80,16 @@ def test_create(api, basename, user, metric, option, period, today):
     last = Entry.objects.all().last()
 
     assert last.user.pk == user.obj.pk
+
+
+def test_destroy(api, basename, user, entry):
+    entry.create()
+    entry.create(user=(other := user.create()))
+
+    assert Entry.objects.count() == 2
+    assert Entry.objects.filter(user=other).count() == 1
+
+    assert api.delete(f'{basename}{entry.obj.pk}/').status_code == 204
+
+    assert Entry.objects.filter(user=other).count() == 1
+    assert Entry.objects.filter(pk=entry.obj.pk).count() == 0
