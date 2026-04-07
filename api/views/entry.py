@@ -13,18 +13,16 @@ class EntryViewSet(CreateModelMixin, GenericViewSet):
 
     filterset_class = EntryFilter
 
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+
     def get_serializer_class(self):  # type: ignore[override]
         if self.action == 'create':
             return EntryCreateSerializer
         return EntryListSerializer
 
     def list(self, request):
-        user = request.user
-
-        if 'month' not in request.query_params:
-            return res(status=400)
-
-        qs = self.filter_queryset(self.get_queryset().filter(user=user))
+        qs = self.filter_queryset(self.get_queryset())
         return res(self.get_serializer(qs, many=True).data)
 
     def create(self, request):
