@@ -1,4 +1,4 @@
-from rest_framework.mixins import CreateModelMixin
+from rest_framework.mixins import CreateModelMixin, DestroyModelMixin
 from rest_framework.viewsets import GenericViewSet
 
 from api.filters import EntryFilter
@@ -8,7 +8,7 @@ from api.services import create_entry
 from api.views.utils import res
 
 
-class EntryViewSet(CreateModelMixin, GenericViewSet):
+class EntryViewSet(CreateModelMixin, DestroyModelMixin, GenericViewSet):
     queryset = Entry.objects.all().prefetch_related('metric', 'option', 'period')
 
     filterset_class = EntryFilter
@@ -33,3 +33,8 @@ class EntryViewSet(CreateModelMixin, GenericViewSet):
             EntryListSerializer(create_entry(**sr.validated_data)).data,
             status=201,
         )
+
+    def destroy(self, request, *args, **kwargs):
+        self.get_queryset().get(pk=kwargs['pk']).delete()
+
+        return res(status=204)
