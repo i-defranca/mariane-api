@@ -16,7 +16,7 @@ class EntryListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Entry
-        fields = ['metric', 'option', 'period', 'entry_date', 'created_at']
+        fields = ['id', 'metric', 'option', 'period', 'entry_date', 'created_at']
 
 
 class EntryCreateSerializer(serializers.Serializer):
