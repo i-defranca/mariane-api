@@ -26,16 +26,17 @@ def test_list(api, url, entry, period, today, assert_list_size):
 
     period.create()
     entry.create()
-    created_at = str(entry.create().created_at)[:10]
+    created = entry.create()
 
     data = assert_list_size(api.get(url), 2)
 
+    assert 'id' in data[0]
     assert 'metric' in data[0]
     assert 'option' in data[0]
     assert 'period' in data[0]
     assert 'entry_date' in data[0]
     assert 'created_at' in data[0]
-    assert any(i['created_at'][:10] == created_at for i in data)
+    assert any(i['id'] == created.id for i in data)
 
     assert isinstance(data[0]['period'], dict)
     assert 'end_date' in data[0]['period']
@@ -69,6 +70,7 @@ def test_create(api, basename, user, metric, option, period, today):
     assert res.status_code == 201
     data = res.json()
 
+    assert data['id'] == metric.obj.pk
     assert data['metric'] == metric.obj.slug
     assert data['option'] == option.obj.label
     assert data['entry_date'] == today().isoformat()
