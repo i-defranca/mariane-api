@@ -69,7 +69,7 @@ class Period(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='periods'
     )
 
-    start_date = models.DateField(null=True, blank=True)
+    start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

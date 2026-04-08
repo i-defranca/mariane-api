@@ -31,10 +31,16 @@ def test_update(period, today):
     assert period.obj.start_date == today(-2)
 
 
-def test_dates_filled_validation(period):
+def test_creation_start_date_required(period):
     # TODO: {error:'dates_required'}
     with pytest.raises(ValidationError):
-        period.create(start_date=None, end_date=None)
+        period.create(start_date=None)
+
+
+def test_update_start_date_required(period):
+    # TODO: {error:'dates_required'}
+    with pytest.raises(ValidationError):
+        period.update(start_date=None)
 
 
 def test_creation_dates_ordering_validation(period, today):

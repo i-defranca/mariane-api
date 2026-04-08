@@ -18,8 +18,8 @@ def link_entries(p):
 
 @transaction.atomic
 def create_period(user, start_date=None, end_date=None):
-    if not start_date and not end_date:
-        raise ValidationError('At least one date is required!')
+    if not start_date:
+        raise ValidationError('Start date is required!')
 
     if start_date and end_date and end_date <= start_date:
         raise ValidationError('Start date must be before end!')
@@ -44,7 +44,10 @@ def update_period(period, **changes):
     for k, v in changes.items():
         setattr(p, k, v)
 
-    if p.start_date and p.end_date and p.end_date <= p.start_date:
+    if not p.start_date:
+        raise ValidationError('Start date is required!')
+
+    if p.end_date and p.end_date <= p.start_date:
         raise ValidationError('Start date must be before end!')
 
     if (
