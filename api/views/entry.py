@@ -1,30 +1,25 @@
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin
 from rest_framework.viewsets import GenericViewSet
 
-from api.filters import ActionAwareBackend, EntryFilter
+from api.filters import EntryFilter
 from api.models import Entry
 from api.serializers import EntryCreateSerializer, EntryListSerializer
 from api.services import create_entry
-from api.views.mixins import UserOwnerMixin
+from api.views.mixins import ListMixin, UserOwnerMixin
 from api.views.utils import res
 
 
-class EntryViewSet(CreateModelMixin, DestroyModelMixin, UserOwnerMixin, GenericViewSet):
+class EntryViewSet(
+    CreateModelMixin, DestroyModelMixin, UserOwnerMixin, ListMixin, GenericViewSet
+):
     queryset = Entry.objects.all().prefetch_related('metric', 'option', 'period')
 
-    filter_backends = [ActionAwareBackend]
-
     filterset_class = EntryFilter
-    filterset_actions = {'list'}
 
-    def get_serializer_class(self):  # type: ignore[override]
-        if self.action == 'create':
-            return EntryCreateSerializer
-        return EntryListSerializer
-
-    def list(self, request):
-        qs = self.filter_queryset(self.get_queryset())
-        return res(self.get_serializer(qs, many=True).data)
+    serializers = {
+        'list': EntryListSerializer,
+        'create': EntryCreateSerializer,
+    }
 
     def create(self, request):
         sr = self.get_serializer(data=request.data)
