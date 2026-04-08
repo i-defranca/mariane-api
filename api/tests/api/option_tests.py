@@ -8,12 +8,28 @@ def url():
     return '/api/options/'
 
 
-def test_list_now_allowed(api, url):
-    assert api.get(url).status_code == 405
-
-
 def test_update_now_allowed(api, url, option):
     assert api.patch(f'{url}{option.obj.pk}/').status_code == 405
+
+
+def test_list_required_param(api, url):
+    assert api.get(url).status_code == 400
+
+
+def test_list(api, url, metric, option, assert_list_size):
+    qry = f'{url}?metric={metric.obj.slug}'
+
+    assert_list_size(api.get(qry), 0)
+
+    option.create(metric=metric.obj)
+    created = option.create(metric=metric.obj)
+
+    data = assert_list_size(api.get(qry), 2)
+
+    assert 'id' in data[0]
+    assert 'metric' in data[0]
+    assert 'label' in data[0]
+    assert any(i['id'] == created.id for i in data)
 
 
 def test_create(api, url, user, metric, lorem):
