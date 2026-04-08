@@ -28,3 +28,6 @@ class EntryCreateSerializer(serializers.Serializer):
         slug_field='label', queryset=MetricOption.objects.all()
     )
     entry_date = serializers.DateField(required=False)
+
+    def to_representation(self, instance):  # type: ignore
+        return EntryListSerializer(instance).data

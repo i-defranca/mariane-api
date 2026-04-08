@@ -1,12 +1,10 @@
-from rest_framework.viewsets import GenericViewSet
-
 from api.filters import PeriodFilter
 from api.models import Period
 from api.serializers import PeriodListSerializer
-from api.views.mixins import ListMixin, UserOwnerMixin
+from api.views.mixins import BaseViewSet, UserOwnerMixin
 
 
-class PeriodViewSet(UserOwnerMixin, ListMixin, GenericViewSet):
+class PeriodViewSet(UserOwnerMixin, BaseViewSet):
     queryset = Period.objects.all()
 
     serializers = {'list': PeriodListSerializer}

@@ -1,18 +1,17 @@
 from django.db.models import Prefetch, Q
-from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from api.models import Metric, MetricOption
 from api.serializers import MetricListSerializer, MetricRetrieveSerializer
+from api.views.mixins import BaseViewSet
 
 
-class MetricViewSet(ReadOnlyModelViewSet):
+class MetricViewSet(BaseViewSet):
     lookup_field = 'slug'
 
-    def get_serializer_class(self):  # type: ignore[override]
-        if self.action == 'retrieve':
-            return MetricRetrieveSerializer
-
-        return MetricListSerializer
+    serializers = {
+        'list': MetricListSerializer,
+        'retrieve': MetricRetrieveSerializer,
+    }
 
     def get_queryset(self):
         qry = Metric.objects.all()
