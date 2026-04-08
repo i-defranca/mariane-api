@@ -38,7 +38,9 @@ def create_period(user, start_date=None, end_date=None):
 
 
 @transaction.atomic
-def update_period(p, **changes):
+def update_period(period, **changes):
+    p = period
+
     for k, v in changes.items():
         setattr(p, k, v)
 

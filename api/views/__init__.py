@@ -1,3 +1,4 @@
+from .entry import EntryViewSet
 from .metric import MetricViewSet
 
-__all__ = ['MetricViewSet']
+__all__ = ['EntryViewSet', 'MetricViewSet']

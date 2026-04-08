@@ -1,9 +1,10 @@
 import re
 
+from django.conf import settings
 from rest_framework import permissions
 from rest_framework_simplejwt import authentication
 
-PUBLIC_PATHS = [r'^/api/auth/token/', r'^/api/$']
+PUBLIC_PATHS = settings.PUBLIC_PATHS
 
 
 def public(request):
