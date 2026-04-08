@@ -1,4 +1,5 @@
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
 
 from api.filters import ActionAwareBackend
@@ -12,6 +13,24 @@ class UserOwnerMixin:
 class BaseViewSet(ModelViewSet):
     filter_backends = [ActionAwareBackend]
     filterset_actions = {'list'}
+
+    pagination = 10
+    default_pagination_class = PageNumberPagination
+    default_pagination_class.page_size_query_param = 'size'
+
+    @property
+    def paginator(self):
+        if not hasattr(self, '_paginator'):
+            if not self.pagination:
+                return None
+            self._paginator = self.default_pagination_class()
+            self._paginator.page_size = self.pagination
+        return self._paginator
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        return qs.order_by('-id') if not qs.ordered else qs
 
     def _attr(self, attr):
         return getattr(self, attr, {})
