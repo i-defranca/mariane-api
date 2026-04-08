@@ -18,9 +18,11 @@ def test_list_required_param(api, basename):
     assert api.get(f'{basename}?month=9090-90').status_code == 400
 
 
-def test_list(api, url, entry, period, today, assert_list_size):
+def test_list(api, url, entry, user, period, today, assert_list_size):
     month = today().month - 1 if today().month > 1 else 12
     entry.create(entry_date=f'{today().year}-{month:02d}-{today().day:02d}')
+
+    entry.create(user=user.create())
 
     assert_list_size(api.get(url), 0)
 
