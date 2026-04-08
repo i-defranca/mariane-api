@@ -16,3 +16,13 @@ class PeriodCreateSerializer(serializers.Serializer):
 
     def to_representation(self, instance):  # type: ignore
         return PeriodListSerializer(instance).data
+
+
+class PeriodUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Period
+        fields = ['start_date', 'end_date']
+        extra_kwargs = {
+            'start_date': {'required': False},
+            'end_date': {'required': False},
+        }

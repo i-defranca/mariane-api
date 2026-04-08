@@ -1,7 +1,7 @@
 from api.filters import PeriodFilter
 from api.models import Period
 from api.serializers import PeriodCreateSerializer, PeriodListSerializer
-from api.services import create_period
+from api.services import create_period, update_period
 from api.views.mixins import BaseViewSet, UserOwnerMixin
 
 
@@ -17,4 +17,5 @@ class PeriodViewSet(UserOwnerMixin, BaseViewSet):
 
     actions = {
         'create': create_period,
+        'update': update_period,
     }
