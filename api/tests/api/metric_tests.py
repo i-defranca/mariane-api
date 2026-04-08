@@ -6,6 +6,10 @@ def url():
     return '/api/metrics/'
 
 
+def test_create_now_allowed(api, url):
+    assert api.post(url, {}).status_code == 405
+
+
 def test_list(api, url, metric, assert_list_size):
     metric.create()
     metric.create()

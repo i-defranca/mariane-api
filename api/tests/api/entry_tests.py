@@ -13,6 +13,14 @@ def url(basename, today):
     return f'{basename}?month={today().year}-{today().month:02d}'
 
 
+def test_retrieve_now_allowed(api, basename, entry):
+    assert api.get(f'{basename}{entry.obj.pk}/').status_code == 405
+
+
+def test_update_now_allowed(api, basename, entry):
+    assert api.patch(f'{basename}{entry.obj.pk}/').status_code == 405
+
+
 def test_list_required_param(api, basename):
     assert api.get(basename).status_code == 400
     assert api.get(f'{basename}?month=9090-90').status_code == 400
