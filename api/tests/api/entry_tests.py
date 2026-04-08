@@ -13,6 +13,14 @@ def url(basename, today):
     return f'{basename}?month={today().year}-{today().month:02d}'
 
 
+def test_retrieve_now_allowed(api, basename, entry):
+    assert api.get(f'{basename}{entry.obj.pk}/').status_code == 405
+
+
+def test_update_now_allowed(api, basename, entry):
+    assert api.patch(f'{basename}{entry.obj.pk}/').status_code == 405
+
+
 def test_list_required_param(api, basename):
     assert api.get(basename).status_code == 400
     assert api.get(f'{basename}?month=9090-90').status_code == 400
@@ -46,21 +54,6 @@ def test_list(api, url, entry, user, period, today, assert_list_size):
 
     assert data[0]['period']['end_date'] == str(period.obj.end_date)
     assert data[0]['period']['start_date'] == str(period.obj.start_date)
-
-
-def test_list_period_filter(api, url, entry, period, assert_list_size):
-    entry.create()
-    entry.create()
-
-    assert_list_size(api.get(f'{url}&period=false'), 2)
-
-    assert_list_size(api.get(f'{url}&period=true'), 0)
-
-    period.create()
-
-    assert_list_size(api.get(f'{url}&period=false'), 0)
-
-    assert_list_size(api.get(f'{url}&period=true'), 2)
 
 
 def test_create(api, basename, user, metric, option, period, today):

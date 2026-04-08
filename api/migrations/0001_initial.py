@@ -100,7 +100,7 @@ class Migration(migrations.Migration):
                         verbose_name='ID',
                     ),
                 ),
-                ('start_date', models.DateField(blank=True, null=True)),
+                ('start_date', models.DateField()),
                 ('end_date', models.DateField(blank=True, null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 (
