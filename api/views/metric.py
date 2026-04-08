@@ -6,6 +6,7 @@ from api.views.mixins import BaseViewSet
 
 
 class MetricViewSet(BaseViewSet):
+    queryset = Metric.objects.all()
     lookup_field = 'slug'
 
     serializers = {
@@ -14,10 +15,10 @@ class MetricViewSet(BaseViewSet):
     }
 
     def get_queryset(self):
-        qry = Metric.objects.all()
+        qs = super().get_queryset()
 
         if self.action == 'retrieve':
-            qry = qry.prefetch_related(
+            qs = qs.prefetch_related(
                 Prefetch(
                     'options',
                     queryset=MetricOption.objects.filter(
@@ -26,4 +27,4 @@ class MetricViewSet(BaseViewSet):
                 )
             )
 
-        return qry.order_by('slug')
+        return qs
