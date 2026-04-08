@@ -87,3 +87,16 @@ def test_update(api, url, user, period, today):
     patch()
     patch('end_date', today(3))
     patch('start_date', today(-2))
+
+
+def test_destroy(api, url, user, period):
+    period.create()
+    period.create(user=(other := user.create()))
+
+    assert Period.objects.count() == 2
+    assert Period.objects.filter(user=other).count() == 1
+
+    assert api.delete(f'{url}{period.obj.pk}/').status_code == 204
+
+    assert Period.objects.filter(user=other).count() == 1
+    assert Period.objects.filter(pk=period.obj.pk).count() == 0
