@@ -37,11 +37,19 @@ def api(user):
 
 @pytest.fixture
 def assert_list_size():
-    def _assert(res, size):
+    def _assert(res, size, paginated=True):
         assert res.status_code == 200
-        assert isinstance(res.json(), list)
-        assert len(res.json()) == size
 
-        return res.json()
+        data = res.json()
+
+        if not paginated:
+            assert isinstance(data, list)
+            assert len(data) == size
+            return data
+
+        assert data['count'] == size
+        assert isinstance(data['results'], list)
+
+        return data['results']
 
     return _assert
