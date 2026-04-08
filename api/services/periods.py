@@ -19,47 +19,49 @@ def link_entries(p):
 @transaction.atomic
 def create_period(user, start_date=None, end_date=None):
     if not start_date:
-        raise ValidationError('Start date is required!')
+        start_date = date.today()
 
     if start_date and end_date and end_date <= start_date:
         raise ValidationError('Start date must be before end!')
 
-    if user.periods.filter(end_date__isnull=True).exists():
+    if not end_date and user.periods.filter(end_date__isnull=True).exists():
         raise ValidationError('You already have an open period!')
 
-    if user.periods.filter(
-        start_date__lte=end_date or date.max, end_date__gte=start_date or date.min
-    ).exists():
+    overlap = user.periods.filter(
+        start_date__lte=end_date or date.max,
+        end_date__gte=start_date,
+    )
+    future = user.periods.filter(start_date__gte=start_date)
+
+    if not end_date and future.exists() or overlap.exists():
         raise ValidationError('Periods cannot overlap!')
 
-    return link_entries(
-        Period.objects.create(user=user, start_date=start_date, end_date=end_date)
-    )
+    period = Period.objects.create(user=user, start_date=start_date, end_date=end_date)
+    return link_entries(period)
 
 
 @transaction.atomic
 def update_period(period, **changes):
-    p = period
+    obj = period
 
     for k, v in changes.items():
-        setattr(p, k, v)
+        setattr(obj, k, v)
 
-    if not p.start_date:
+    if not obj.start_date:
         raise ValidationError('Start date is required!')
 
-    if p.end_date and p.end_date <= p.start_date:
+    if obj.end_date and obj.end_date <= obj.start_date:
         raise ValidationError('Start date must be before end!')
 
-    if (
-        p.user.periods.filter(
-            start_date__lte=p.end_date or date.max,
-            end_date__gte=p.start_date or date.min,
-        )
-        .exclude(pk=p.pk)
-        .exists()
-    ):
+    overlap = obj.user.periods.filter(
+        start_date__lte=obj.end_date or date.max,
+        end_date__gte=obj.start_date,
+    ).exclude(pk=obj.pk)
+    future = obj.user.periods.filter(start_date__gte=obj.start_date)
+
+    if not obj.end_date and future.exists() or overlap.exists():
         raise ValidationError('Periods cannot overlap!')
 
-    p.save()
+    obj.save()
 
-    return link_entries(p)
+    return link_entries(obj)
