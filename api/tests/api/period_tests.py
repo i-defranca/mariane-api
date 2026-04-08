@@ -1,5 +1,7 @@
 import pytest
 
+from api.models import Period
+
 
 @pytest.fixture
 def url():
@@ -32,3 +34,26 @@ def test_list(api, url, user, period, today, assert_list_size):
     assert 'end_date' in data[0]
     assert 'created_at' in data[0]
     assert any(i['id'] == created.id for i in data)
+
+
+def test_create(api, url, user, today):
+    body = {'start_date': today(-5), 'end_date': today(-1)}
+
+    assert (res := api.post(url, body)).status_code == 201
+    data = res.json()
+
+    obj = Period.objects.all().last()
+
+    assert data['id'] == obj.pk
+    assert data['start_date'] == today(-5).isoformat()
+    assert data['end_date'] == today(-1).isoformat()
+    assert obj.user.pk == user.obj.pk
+
+
+def test_create_default_start(api, url, today):
+    assert (res := api.post(url, {})).status_code == 201
+
+    obj = Period.objects.all().last()
+
+    assert res.json()['id'] == obj.pk
+    assert obj.start_date == today()
