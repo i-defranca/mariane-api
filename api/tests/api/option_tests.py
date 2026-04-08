@@ -19,12 +19,12 @@ def test_list_required_param(api, url):
 def test_list(api, url, metric, option, assert_list_size):
     qry = f'{url}?metric={metric.obj.slug}'
 
-    assert_list_size(api.get(qry), 0)
+    assert_list_size(api.get(qry), 0, paginated=False)
 
     option.create(metric=metric.obj)
     created = option.create(metric=metric.obj)
 
-    data = assert_list_size(api.get(qry), 2)
+    data = assert_list_size(api.get(qry), 2, paginated=False)
 
     assert 'id' in data[0]
     assert 'metric' in data[0]
