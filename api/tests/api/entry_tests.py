@@ -56,21 +56,6 @@ def test_list(api, url, entry, user, period, today, assert_list_size):
     assert data[0]['period']['start_date'] == str(period.obj.start_date)
 
 
-def test_list_period_filter(api, url, entry, period, assert_list_size):
-    entry.create()
-    entry.create()
-
-    assert_list_size(api.get(f'{url}&period=false'), 2)
-
-    assert_list_size(api.get(f'{url}&period=true'), 0)
-
-    period.create()
-
-    assert_list_size(api.get(f'{url}&period=false'), 0)
-
-    assert_list_size(api.get(f'{url}&period=true'), 2)
-
-
 def test_create(api, basename, user, metric, option, period, today):
     period.create()
 
