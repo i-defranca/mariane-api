@@ -29,9 +29,9 @@ A Django REST API for tracking menstrual cycles and daily metrics, aiming to pro
 
 ### 1) Clone the repository
 ```bash
-git clone https://github.com/i-defranca/COM200 karte
+git clone https://github.com/i-defranca/mariane-api api
 # go the the project directory
-cd karte
+cd api
 ```
 
 ### 2) Python Setup
