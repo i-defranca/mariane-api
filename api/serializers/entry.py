@@ -20,6 +20,7 @@ class EntryListSerializer(serializers.ModelSerializer):
 
 
 class EntryCreateSerializer(serializers.Serializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     metric = serializers.SlugRelatedField(
         slug_field='slug', queryset=Metric.objects.all()
     )
@@ -27,8 +28,3 @@ class EntryCreateSerializer(serializers.Serializer):
         slug_field='label', queryset=MetricOption.objects.all()
     )
     entry_date = serializers.DateField(required=False)
-
-    def validate(self, attrs):
-        attrs['user'] = self.context['request'].user
-
-        return attrs
