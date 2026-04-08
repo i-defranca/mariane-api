@@ -5,19 +5,17 @@ from api.filters import ActionAwareBackend, EntryFilter
 from api.models import Entry
 from api.serializers import EntryCreateSerializer, EntryListSerializer
 from api.services import create_entry
+from api.views.mixins import UserOwnerMixin
 from api.views.utils import res
 
 
-class EntryViewSet(CreateModelMixin, DestroyModelMixin, GenericViewSet):
+class EntryViewSet(CreateModelMixin, DestroyModelMixin, UserOwnerMixin, GenericViewSet):
     queryset = Entry.objects.all().prefetch_related('metric', 'option', 'period')
 
     filter_backends = [ActionAwareBackend]
 
     filterset_class = EntryFilter
     filterset_actions = {'list'}
-
-    def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
 
     def get_serializer_class(self):  # type: ignore[override]
         if self.action == 'create':
