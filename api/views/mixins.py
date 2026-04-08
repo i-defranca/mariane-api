@@ -58,7 +58,6 @@ class BaseViewSet(ModelViewSet):
             serializer.instance = self.instance = ins
 
     def perform_update(self, serializer):
-        if not callable(update := self._attr('actions').get('update')):
-            return
-        ins = update(serializer.instance, **serializer.validated_data)
-        serializer.instance = self.instance = ins
+        if callable(update := self._attr('actions').get('update')):
+            ins = update(serializer.instance, **serializer.validated_data)
+            serializer.instance = self.instance = ins

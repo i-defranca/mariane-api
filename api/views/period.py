@@ -16,6 +16,7 @@ class PeriodViewSet(UserOwnerMixin, BaseViewSet):
     }
 
     actions = {
+        'destroy': True,
         'create': create_period,
         'update': update_period,
     }
