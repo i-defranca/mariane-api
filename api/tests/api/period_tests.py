@@ -57,3 +57,33 @@ def test_create_default_start(api, url, today):
 
     assert res.json()['id'] == obj.pk
     assert obj.start_date == today()
+
+
+def test_update(api, url, user, period, today):
+    def patch(dt=None, val=None):
+        if dt is None:
+            body = {'start_date': today(-3), 'end_date': today(-2)}
+        else:
+            body = {dt: val}
+
+        res = api.patch(f'{url}{period.obj.pk}/', body)
+        assert res.status_code == 200
+        data = res.json()
+
+        assert data['id'] == period.obj.pk
+        if dt is None or val is None:
+            assert data['end_date'] == today(-2).isoformat()
+            assert data['start_date'] == today(-3).isoformat()
+        else:
+            assert data[dt] == val.isoformat()
+            period.obj.refresh_from_db()
+            assert data['start_date'] == period.obj.start_date.isoformat()
+            assert data['end_date'] == period.obj.end_date.isoformat()
+
+        assert period.obj.user.pk == user.obj.pk
+
+    period.create()
+
+    patch()
+    patch('end_date', today(3))
+    patch('start_date', today(-2))
