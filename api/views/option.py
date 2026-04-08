@@ -10,6 +10,8 @@ class OptionViewSet(UserOwnerMixin, BaseViewSet):
 
     filterset_class = OptionFilter
 
+    pagination = False
+
     serializers = {
         'list': OptionListSerializer,
         'create': OptionCreateSerializer,
