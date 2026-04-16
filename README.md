@@ -3,6 +3,7 @@
 [![CI](https://github.com/i-defranca/mariane-api/actions/workflows/ci.yml/badge.svg)](https://github.com/i-defranca/mariane-api/actions/workflows/ci.yml)
 [![Coverage](https://codecov.io/gh/i-defranca/mariane-api/graph/badge.svg?token=LNC0J557JV)](https://codecov.io/gh/i-defranca/mariane-api)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](LICENSE)
+![Python](https://img.shields.io/badge/python-3.X.Y-blue)
 
 A Django REST API for tracking menstrual cycles and daily metrics, aiming to provide personalized insights and predictions.
 
@@ -20,7 +21,7 @@ A Django REST API for tracking menstrual cycles and daily metrics, aiming to pro
 - MySQL running inside a Docker container
 - Environment variables loaded from `.env` file
 
-##  Requirements
+## Requirements
 - Python 3.12.2 (with pyenv)
 - Docker
 - Docker Compose v2
